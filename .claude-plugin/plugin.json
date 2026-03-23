@@ -1,0 +1,18 @@
+{
+  "name": "cofolio",
+  "version": "0.1.0",
+  "description": "A multi-stage portfolio construction and maintenance advisor. Guides users from investor profiling through asset allocation, macro research, security selection, portfolio construction, and ongoing rebalancing.",
+  "author": {
+    "name": "Abdul Rahman Al-Kibbe",
+    "url": "https://github.com/yogur/cofolio"
+  },
+  "license": "MIT",
+  "keywords": [
+    "portfolio",
+    "investing",
+    "ETF",
+    "rebalancing",
+    "finance",
+    "stocks"
+  ]
+}
