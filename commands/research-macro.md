@@ -1,3 +1,8 @@
+---
+name: research-macro
+description: Research current macroeconomic conditions and geopolitical themes. Can be run standalone or as part of the portfolio pipeline.
+---
+
 # /research-macro
 
 Standalone entry to Stage 3 (Macro Research). Research current macroeconomic conditions and geopolitical themes, regardless of where the portfolio pipeline currently stands.

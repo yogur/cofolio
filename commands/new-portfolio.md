@@ -1,3 +1,8 @@
+---
+name: new-portfolio
+description: Start building a new investment portfolio from scratch. Begins with investor profiling and walks through the full pipeline.
+---
+
 # /new-portfolio
 
 Start a new portfolio build using the CoFolio pipeline.

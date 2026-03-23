@@ -1,3 +1,8 @@
+---
+name: portfolio-status
+description: Show the current state of the portfolio pipeline — which stages are complete, current allocation vs. targets, and any pending actions.
+---
+
 # /portfolio-status
 
 Read-only command. Summarize the current state of the portfolio pipeline without invoking any stage skill or modifying any files.

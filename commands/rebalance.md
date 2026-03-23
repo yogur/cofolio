@@ -1,3 +1,8 @@
+---
+name: rebalance
+description: Review and rebalance an existing portfolio. Checks drift from targets, validates hypotheses, and produces updated recommendations.
+---
+
 # /rebalance
 
 Trigger a rebalancing review for an existing portfolio. Requires `portfolio.json` to be present.
