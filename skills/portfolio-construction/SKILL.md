@@ -214,3 +214,7 @@ After writing the final `portfolio.json`, tell the user:
 - **The analysis section uses script outputs directly.** Don't manually calculate overlap, fees, or concentration — use the scripts. They handle edge cases (missing data, null weights) consistently. You interpret and present the results.
 - **Fee drag projections need investor profile data.** The fee drag numbers are much more meaningful with actual contribution amounts and initial values. If `investor-profile.md` has these, use them. If not, note the assumptions clearly.
 - **Don't over-optimize.** A portfolio with 19.25% vs 19.5% in a position is not meaningfully different. Focus the user's attention on decisions that matter — large weight shifts, concentrated exposures, expensive positions — not cosmetic precision.
+
+## After This Stage Completes
+
+Once the output file is written, generate or update `CLAUDE.md` in the project root following the orchestrator's CLAUDE.md Generation instructions. Read whichever pipeline files exist and assemble the context file so a fresh session has full context.

@@ -132,3 +132,7 @@ After the report is finalized:
 - **Don't re-run analysis scripts.** The analysis was already done in Stage 5 and is captured in `portfolio.json`'s `analysis` section. Use those numbers directly. If the analysis section is missing, suggest re-running Stage 5 first.
 - **Fee drag projections should reference the investor's actual numbers.** Use their contribution amount and initial value, not generic assumptions. The numbers in the `analysis` section were already computed with these inputs by Stage 5.
 - **Handle missing optional data gracefully.** If `watchlist` is empty, say so briefly. If `valuation_snapshot` is null for an instrument, skip valuation details for that position. Don't leave blank sections or placeholders.
+
+## After This Stage Completes
+
+Once the output file is written, generate or update `CLAUDE.md` in the project root following the orchestrator's CLAUDE.md Generation instructions. Read whichever pipeline files exist and assemble the context file so a fresh session has full context.

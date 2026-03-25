@@ -216,3 +216,7 @@ After writing, tell the user:
 - **Respect instrument preferences.** If the user's profile says "ETFs only," don't present stock candidates unless asked. If the profile says "ETFs and stocks," offer both where relevant (stocks mainly for satellites/conviction positions).
 - **Track overlap as you go.** If the user selects an S&P 500 ETF for core and then a NASDAQ 100 ETF for a tech satellite, note the significant holdings overlap (both are heavy in AAPL, MSFT, NVDA). Don't block the selection — just flag it so the user makes a conscious choice.
 - **Don't assign weights.** This stage selects instruments. Weights come in Stage 5. If the user asks about weights, acknowledge and tell them it's the next step.
+
+## After This Stage Completes
+
+Once the output file is written, generate or update `CLAUDE.md` in the project root following the orchestrator's CLAUDE.md Generation instructions. Read whichever pipeline files exist and assemble the context file so a fresh session has full context.

@@ -124,3 +124,7 @@ After writing the file, tell the user:
 - **Respect "I'm not interested in macro themes."** Some users may want a purely strategic allocation without thematic tilts. That's a valid choice — write a `macro-themes.md` with all themes marked as not selected and note "User opted for purely strategic allocation without thematic tilts" in the User-Added Themes section.
 - **Keep the file complete.** Every theme the agent found goes in the file, selected or not. The file is a research snapshot, not just a selection list. Downstream stages and future rebalancing cycles benefit from seeing the full picture.
 - **Flag stale research.** If you're refreshing existing themes and the agent's findings have materially changed from what's in the old file (e.g., a previously high-confidence theme now has contradictory evidence), highlight this to the user.
+
+## After This Stage Completes
+
+Once the output file is written, generate or update `CLAUDE.md` in the project root following the orchestrator's CLAUDE.md Generation instructions. Read whichever pipeline files exist and assemble the context file so a fresh session has full context.

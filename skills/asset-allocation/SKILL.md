@@ -87,3 +87,7 @@ After writing, tell the user what was saved and what comes next: "Your target al
 - **Respect the user's final say.** If they want 100% equities despite a conservative profile, you've done your job by flagging the conflict. Record what they choose.
 - **Keep it practical.** A portfolio with 15 tiny allocation slots is hard to manage with €500/month. Factor in contribution size when deciding how many distinct positions make sense.
 - **Don't give financial advice.** You're presenting frameworks and trade-offs, not telling the user what to do. "Based on your profile, a common approach would be..." rather than "You should..."
+
+## After This Stage Completes
+
+Once the output file is written, generate or update `CLAUDE.md` in the project root following the orchestrator's CLAUDE.md Generation instructions. Read whichever pipeline files exist and assemble the context file so a fresh session has full context.

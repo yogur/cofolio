@@ -71,3 +71,7 @@ After writing, tell the user what was saved and what comes next: "Your investor 
 - **Keep it human.** This is a conversation about the user's financial life. Some people find it stressful or personal. Be respectful and encouraging without being patronizing.
 - **Don't give financial advice.** You're collecting preferences and explaining trade-offs, not recommending specific actions. Phrases like "many investors in your situation..." or "a common approach is..." are fine. "You should..." is not.
 - **One stage at a time.** Don't start discussing specific ETFs, allocation percentages, or macro themes during the profile stage. If the user asks forward-looking questions, acknowledge them and note that those will be covered in later stages.
+
+## After This Stage Completes
+
+Once the output file is written, generate or update `CLAUDE.md` in the project root following the orchestrator's CLAUDE.md Generation instructions. Read whichever pipeline files exist and assemble the context file so a fresh session has full context.

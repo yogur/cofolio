@@ -208,3 +208,7 @@ After completing the maintenance cycle:
 - **Stale data is a risk.** Flag data freshness prominently. Instrument holdings data from 6 months ago may not reflect current ETF compositions. Macro research from 2 months ago may miss important developments. Be transparent about what you're working with.
 - **Use the scripts.** Don't manually compute drift or rebalancing allocations — the scripts handle edge cases. You interpret and present the results.
 - **The user's brokerage constrains execution.** Any buy/sell recommendations must be executable on the user's platform (from `investor-profile.md`). Include tickers, exchanges, and amounts.
+
+## After This Stage Completes
+
+Once the output file is written, generate or update `CLAUDE.md` in the project root following the orchestrator's CLAUDE.md Generation instructions. Read whichever pipeline files exist and assemble the context file so a fresh session has full context.
