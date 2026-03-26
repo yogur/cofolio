@@ -1,5 +1,32 @@
 # CoFolio — Developer Notes
 
+## Project Overview
+
+CoFolio is a Cowork plugin that guides users through a multi-stage investment portfolio construction and maintenance pipeline. It produces file-based state (Markdown + JSON) in the user's workspace directory, from investor profiling through to an actionable portfolio report with ongoing rebalancing.
+
+## Technical Stack
+
+- Python 3.10+ for analysis scripts (numpy, pandas)
+- Dependencies installed automatically via `SessionStart` hook into `${CLAUDE_PLUGIN_DATA}/python_deps`
+- No build step — plugin is pure Markdown skills/agents/commands + Python scripts
+
+## Architecture
+
+- **Commands** (`commands/`): User-facing entry points — `/new-portfolio`, `/portfolio-status`, `/rebalance`, `/research-macro`. Each is a `.md` file that routes to the orchestrator or a specific skill.
+- **Orchestrator** (`skills/orchestrator/`): Central controller. Detects pipeline stage by checking which files exist (`investor-profile.md` → `asset-allocation.md` → `macro-themes.md` → `portfolio.json` → `report.md`) and routes to the appropriate skill.
+- **Stage skills** (`skills/`): One skill per pipeline stage — `investor-profile`, `asset-allocation`, `macro-research`, `security-selection`, `portfolio-construction`, `report-generation`, `maintenance`. Each has `SKILL.md` (prompt) and `reference.md` (domain knowledge).
+- **Subagents** (`agents/`): `macro-researcher.md` and `security-screener.md` — model: sonnet, web-enabled, no file-write access. Invoked by their respective skills.
+- **Scripts** (`scripts/`): Python analysis tools invoked by skills with `--json` for machine-readable output. Detailed below.
+- **Hooks** (`hooks/`): `SessionStart` hook runs `install_deps.py` to ensure Python dependencies are available.
+- **Pipeline files** (in user's workspace): `investor-profile.md`, `asset-allocation.md`, `macro-themes.md`, `portfolio.json`, `report.md` — both checkpoints and deliverables.
+
+## Codebase Patterns
+
+- Skills follow a consistent structure: `SKILL.md` contains the system prompt, `reference.md` contains domain knowledge the skill can reference.
+- The orchestrator generates a `CLAUDE.md` in the user's portfolio workspace to persist context across sessions.
+- Subagents are read-only (disallowed: Write, Edit) — they research and return data, skills handle file writes.
+- Commands are thin wrappers that set intent and delegate to the orchestrator.
+
 ## Scripts (`scripts/`)
 
 - All analysis scripts read `portfolio.json` from a path passed as a positional CLI argument (default: `portfolio.json` in CWD).
