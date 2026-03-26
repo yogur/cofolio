@@ -28,7 +28,8 @@ Think of it as having a knowledgeable financial advisor on call who walks you th
 <summary>Also installable via Claude Code</summary>
 
 ```bash
-claude plugin add yogur/cofolio
+/plugin marketplace add yogur/cofolio
+/plugin install cofolio@cofolio-marketplace
 ```
 </details>
 

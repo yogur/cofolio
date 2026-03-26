@@ -1,0 +1,18 @@
+{
+  "name": "cofolio-marketplace",
+  "owner": {
+    "name": "Abdul Rahman Al-Kibbe"
+  },
+  "metadata": {
+    "description": "Investment portfolio construction and maintenance tools",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "cofolio",
+      "source": "./",
+      "description": "A multi-stage portfolio construction and maintenance advisor. Guides users from investor profiling through asset allocation, macro research, security selection, portfolio construction, and ongoing rebalancing.",
+      "version": "1.0.0"
+    }
+  ]
+}
