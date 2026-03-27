@@ -8,27 +8,26 @@ CoFolio is a Cowork plugin that guides users through a multi-stage investment po
 
 - Python 3.10+ for analysis scripts (numpy, pandas)
 - Dependencies installed automatically via `SessionStart` hook into `${CLAUDE_PLUGIN_DATA}/python_deps`
-- No build step — plugin is pure Markdown skills/agents/commands + Python scripts
+- No build step — plugin is pure Markdown skills/agents + Python scripts
 
 ## Architecture
 
-- **Commands** (`commands/`): User-facing entry points — `/new-portfolio`, `/portfolio-status`, `/rebalance`, `/research-macro`. Each is a `.md` file that routes to the orchestrator or a specific skill.
-- **Orchestrator** (`skills/orchestrator/`): Central controller. Detects pipeline stage by checking which files exist (`investor-profile.md` → `asset-allocation.md` → `macro-themes.md` → `portfolio.json` → `report.md`) and routes to the appropriate skill.
-- **Stage skills** (`skills/`): One skill per pipeline stage — `investor-profile`, `asset-allocation`, `macro-research`, `security-selection`, `portfolio-construction`, `report-generation`, `maintenance`. Each has `SKILL.md` (prompt) and `reference.md` (domain knowledge).
-- **Subagents** (`agents/`): `macro-researcher.md` and `security-screener.md` — model: sonnet, web-enabled, no file-write access. Invoked by their respective skills.
-- **Scripts** (`scripts/`): Python analysis tools invoked by skills with `--json` for machine-readable output. Detailed below.
-- **Hooks** (`hooks/`): `SessionStart` hook runs `install_deps.py` to ensure Python dependencies are available.
+- **Portfolio Advisor skill** (`skills/portfolio-advisor/`): Single entry point — handles intent detection, pipeline state detection, stage routing, and CLAUDE.md generation. `SKILL.md` is the main prompt; `references/` contains on-demand stage files.
+- **Reference files** (`skills/portfolio-advisor/references/`): One file per pipeline stage (`1-investor-profile.md` through `7-maintenance.md`), each containing merged instructions and domain knowledge for that stage.
+- **Subagents** (`agents/`): `macro-researcher.md` and `security-screener.md` — model: sonnet, web-enabled, no file-write access. Invoked by their respective stages.
+- **Analysis scripts** (`skills/portfolio-advisor/scripts/`): Python analysis tools invoked by skills with `--json` for machine-readable output. Detailed below.
+- **Hooks** (`hooks/`): `SessionStart` hook runs `scripts/install_deps.py` to ensure Python dependencies are available.
 - **Pipeline files** (in user's workspace): `investor-profile.md`, `asset-allocation.md`, `macro-themes.md`, `portfolio.json`, `report.md` — both checkpoints and deliverables.
 
 ## Codebase Patterns
 
-- Skills follow a consistent structure: `SKILL.md` contains the system prompt, `reference.md` contains domain knowledge the skill can reference.
-- The orchestrator generates a `CLAUDE.md` in the user's portfolio workspace to persist context across sessions.
+- Single skill (`portfolio-advisor`) handles all pipeline stages; stage-specific instructions and domain knowledge are loaded on demand from `references/N-stage-name.md` files.
+- The portfolio-advisor skill generates a `CLAUDE.md` in the user's portfolio workspace to persist context across sessions.
 - Subagents are read-only (disallowed: Write, Edit) — they research and return data, skills handle file writes.
-- Commands are thin wrappers that set intent and delegate to the orchestrator.
 
-## Scripts (`scripts/`)
+## Scripts
 
+- Analysis scripts live at `skills/portfolio-advisor/scripts/` (overlap.py, fees.py, concentration.py, drift.py, rebalance.py). The hook script `install_deps.py` lives at the plugin-level `scripts/`.
 - All analysis scripts read `portfolio.json` from a path passed as a positional CLI argument (default: `portfolio.json` in CWD).
 - Scripts accept `--json` to emit machine-readable output for skill consumption. The JSON format matches the `analysis` section schema in `portfolio.json` (see PRD Section 4 / Stage 5).
 - `overlap.py`: position `type` field drives logic — `"etf"` decomposes `top_holdings`, `"stock"` counts directly at `target_weight_pct`. Other types (bonds, cash) are silently skipped.

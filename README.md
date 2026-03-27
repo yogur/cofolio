@@ -38,7 +38,7 @@ Think of it as having a knowledgeable financial advisor on call who walks you th
 Open Cowork in any empty directory (this becomes your portfolio workspace):
 
 ```
-/new-portfolio
+/portfolio-advisor
 ```
 
 CoFolio takes it from there. It'll ask about your financial situation, research the markets, help you pick investments, and produce a full portfolio report — all as a guided conversation.
@@ -85,10 +85,7 @@ Markets move. CoFolio helps you stay on track with drift analysis and rebalancin
 
 | Command | What it does |
 |---------|-------------|
-| `/new-portfolio` | Start a new portfolio from scratch (or resume one in progress) |
-| `/portfolio-status` | Check where things stand: stage progress, allocation vs. targets, data freshness |
-| `/rebalance` | Run a maintenance check on an existing portfolio with drift analysis and contribution optimization |
-| `/research-macro` | Run standalone macro research anytime, even outside a full portfolio build |
+| `/portfolio-advisor` | Your single entry point for everything: start or resume a portfolio build, check status, run a rebalance check, or do standalone macro research |
 
 ## Under the Hood
 
@@ -98,14 +95,7 @@ CoFolio is built from modular components. Here's what powers each part of the ex
 
 | Skill | Role |
 |-------|------|
-| Orchestrator | The traffic controller: detects where you are in the pipeline and routes you to the right stage |
-| Investor Profile | Guides the conversational Q&A to capture your financial identity |
-| Asset Allocation | Proposes and negotiates your target allocation based on your profile |
-| Macro Research | Coordinates market research and helps you select investment themes |
-| Security Selection | Manages the instrument screening and comparison process |
-| Portfolio Construction | Assigns weights, runs analysis, and lets you refine the result |
-| Report Generation | Compiles everything into a readable portfolio report |
-| Maintenance | Orchestrates drift checks, rebalancing, and periodic reviews |
+| Portfolio Advisor | Single orchestrator: detects intent and pipeline stage, loads the relevant stage reference file, and guides you through every step from profiling to maintenance |
 
 ### AI Research Agents
 
