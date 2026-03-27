@@ -29,7 +29,7 @@ Think of it as having a knowledgeable financial advisor on call who walks you th
 
 ```bash
 /plugin marketplace add yogur/cofolio
-/plugin install cofolio@cofolio-marketplace
+/plugin install cofolio@alkibbe-ai-plugins
 ```
 </details>
 
