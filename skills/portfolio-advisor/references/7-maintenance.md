@@ -76,7 +76,21 @@ If the user can only provide the total portfolio value and no per-position data,
 **Option D — Weights already in portfolio.json:**
 If positions have `current_weight_pct` fields populated (from a previous maintenance run), you can use those — but note the date they were captured and ask if they're still accurate.
 
-Also ask for the **total portfolio value** — this is needed by both `drift.py --value` and `rebalance.py --value` for trade sizing.
+**Option E — Automated via prices.py (preferred when user has share counts):**
+If the user can provide the number of shares they hold per position, use `prices.py` to fetch live prices and compute current weights automatically:
+
+1. Populate `current_holdings` in `portfolio.json` with the user's share counts for each position.
+2. Run the price fetcher:
+   ```bash
+   python scripts/prices.py portfolio.json --json
+   ```
+3. The JSON output includes `total_value` (use for `--value` arguments) and `current_weights` (a `{ticker: weight_pct}` object). Write `current_weights` to `current_weights.json` for consumption by `drift.py --current` and `rebalance.py --current`.
+
+This eliminates manual weight calculation and provides the total portfolio value automatically. It is the preferred approach when the user has share counts but not pre-calculated weights or values.
+
+Note: European tickers may need exchange suffix resolution. `prices.py` automatically maps the `exchange` field in each instrument (e.g., XETRA → `.DE`) to the correct yfinance ticker. If resolution fails for a ticker, add `--exchange-suffix DE` (or the appropriate suffix) as a fallback.
+
+Also ask for the **total portfolio value** — this is needed by both `drift.py --value` and `rebalance.py --value` for trade sizing. If using `prices.py`, the `total_value` field in its output provides this automatically.
 
 ### 3. Run drift analysis
 
@@ -412,6 +426,96 @@ python scripts/rebalance.py portfolio.json --current current_weights.json --cont
 - `fully_rebalanced`: Whether one month's contribution fully corrects all drift
 - `months_to_target`: Estimated months to fully rebalance via contributions (null if already rebalanced)
 - `sell_suggestions`: Only populated when drift can't be corrected within `--timeframe` months
+
+### prices.py
+
+**Purpose:** Fetch latest prices for all portfolio tickers via yfinance and compute current values/weights from share counts.
+
+**Invocation:**
+```bash
+python scripts/prices.py portfolio.json --json
+```
+
+**Arguments:**
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `portfolio.json` | Yes | `portfolio.json` | Path to portfolio file |
+| `--exchange-suffix SUF` | No | None | Default yfinance suffix for tickers without a dot (e.g., `DE` for XETRA) |
+| `--json` | Yes (for skill) | off | Machine-readable output |
+
+**Prerequisites:** Each position's `current_holdings` field must be populated with the number of shares. Positions without `current_holdings` still get prices fetched but won't have values/weights computed.
+
+**JSON output:**
+```json
+{
+  "as_of": "2026-04-15T16:30:00",
+  "positions": [
+    {
+      "name": "iShares Core S&P 500",
+      "ticker": "SXR8",
+      "ticker_resolved": "SXR8.DE",
+      "price": 542.30,
+      "currency": "EUR",
+      "price_date": "2026-04-15",
+      "shares": 15.5,
+      "value": 8405.65,
+      "current_weight_pct": 22.1
+    }
+  ],
+  "failed_tickers": [],
+  "total_value": 38030.12,
+  "current_weights": {"SXR8": 22.1, "VXUS": 14.8}
+}
+```
+
+**Key fields:**
+- `current_weights`: Object keyed by ticker — write this to `current_weights.json` for use by `drift.py --current` and `rebalance.py --current`
+- `total_value`: Total portfolio value — use for `drift.py --value` and `rebalance.py --value`
+- `failed_tickers`: Tickers that could not be resolved via yfinance
+- `ticker_resolved`: The yfinance ticker that successfully resolved (may differ from portfolio.json ticker due to exchange suffix)
+
+**Ticker resolution:** The script tries each ticker as-is first, then with `--exchange-suffix` if provided, then by mapping the `instrument.exchange` field (XETRA→`.DE`, Euronext Amsterdam→`.AS`, LSE→`.L`, etc.). If all attempts fail, the ticker is skipped with a warning.
+
+### dca.py
+
+**Purpose:** Compute ideal DCA (dollar cost averaging) allocation based on target weights. Simple split — no drift awareness.
+
+**Invocation:**
+```bash
+python scripts/dca.py portfolio.json --contribution <MONTHLY> --json
+```
+
+**Arguments:**
+
+| Argument | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `portfolio.json` | Yes | `portfolio.json` | Path to portfolio file |
+| `--contribution AMT` | **Yes** | — | Monthly contribution in portfolio currency |
+| `--json` | Yes (for skill) | off | Machine-readable output |
+
+**JSON output:**
+```json
+{
+  "contribution": 2000.00,
+  "positions": [
+    {
+      "name": "iShares Core S&P 500",
+      "ticker": "SXR8",
+      "target_weight_pct": 19.25,
+      "allocation": 385.00
+    }
+  ],
+  "total_allocated": 2000.00,
+  "total_weight_pct": 100.0
+}
+```
+
+**Key fields:**
+- `allocation`: Currency amount to buy for this position
+- `total_weight_pct`: Sum of target weights — should be ~100%. If not, the difference is unallocated.
+
+**When to use:** Use `dca.py` when the user wants a quick "how to split my contribution" answer and current weights are unavailable or unnecessary. For drift-correcting allocation (which accounts for positions being over/underweight), use `rebalance.py` instead.
 
 ### Portfolio Analysis Scripts (for re-analysis after weight changes)
 

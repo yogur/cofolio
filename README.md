@@ -113,6 +113,8 @@ CoFolio is built from modular components. Here's what powers each part of the ex
 | Concentration analysis | Maps your true geographic and sector exposure |
 | Drift analysis | Measures how far your current portfolio has drifted from targets |
 | Rebalancing optimizer | Calculates how to allocate contributions to minimize drift without selling |
+| Price fetcher | Fetches live prices via yfinance and computes current portfolio weights from holdings |
+| DCA calculator | Shows how to split monthly contributions across positions based on target weights |
 
 ## License
 
