@@ -17,6 +17,7 @@ Arguments:
 
 import argparse
 import json
+import math
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,25 +61,42 @@ def load_portfolio(path: str) -> dict:
 def resolve_ticker(ticker: str, exchange: str, suffix: str | None) -> list[str]:
     """
     Return a list of yfinance ticker candidates to try, in priority order.
+
+    When a known non-US exchange is provided, the suffixed ticker is tried
+    first to avoid false matches against US-listed securities with the same
+    bare symbol (e.g. SMH on XETRA vs SMH on NYSE).
     """
     candidates: list[str] = []
 
-    # 1. Try ticker as-is
-    candidates.append(ticker)
+    # 1. If exchange maps to a non-empty suffix, try that first (avoids US
+    #    false positives for European/Asian tickers).
+    mapped_suffix: str | None = None
+    if exchange:
+        mapped_suffix = EXCHANGE_SUFFIX_MAP.get(exchange)
+        if mapped_suffix and "." not in ticker:
+            candidates.append(f"{ticker}.{mapped_suffix}")
 
     # 2. If --exchange-suffix provided and ticker has no dot, try with suffix
     if suffix and "." not in ticker:
-        candidates.append(f"{ticker}.{suffix}")
+        suffixed = f"{ticker}.{suffix}"
+        if suffixed not in candidates:
+            candidates.append(suffixed)
 
-    # 3. Map from instrument.exchange field
-    if exchange:
-        mapped_suffix = EXCHANGE_SUFFIX_MAP.get(exchange)
-        if mapped_suffix is not None and "." not in ticker:
-            suffixed = f"{ticker}.{mapped_suffix}" if mapped_suffix else ticker
-            if suffixed not in candidates:
-                candidates.append(suffixed)
+    # 3. Try ticker as-is (fallback for US tickers or tickers that already
+    #    contain a dot suffix)
+    if ticker not in candidates:
+        candidates.append(ticker)
 
     return candidates
+
+
+def _is_valid_price(price: float | None) -> bool:
+    """Return True if price is a usable positive number (not None, NaN, or <= 0)."""
+    if price is None:
+        return False
+    if isinstance(price, float) and math.isnan(price):
+        return False
+    return price > 0
 
 
 def fetch_price(candidates: list[str]) -> dict | None:
@@ -91,17 +109,29 @@ def fetch_price(candidates: list[str]) -> dict | None:
             t = yf.Ticker(candidate)
             info = t.fast_info
             price = getattr(info, "last_price", None)
-            if price is None or price <= 0:
-                continue
             currency = getattr(info, "currency", None) or "Unknown"
-            # Get the last trade date from history
-            price_date = None
+
+            # Fetch recent history once — used for fallback price and price_date
+            hist = None
             try:
                 hist = t.history(period="5d")
-                if not hist.empty:
-                    price_date = str(hist.index[-1].date())
             except Exception:
                 pass
+
+            # If last_price is invalid, fall back to latest history close
+            if not _is_valid_price(price):
+                if hist is not None and not hist.empty:
+                    price = float(hist["Close"].iloc[-1])
+                else:
+                    continue
+
+            if not _is_valid_price(price):
+                continue
+
+            price_date = None
+            if hist is not None and not hist.empty:
+                price_date = str(hist.index[-1].date())
+
             return {
                 "ticker_resolved": candidate,
                 "price": round(float(price), 4),
@@ -140,7 +170,10 @@ def process_positions(
             )
             continue
 
+        isin = instrument.get("isin", "")
         candidates = resolve_ticker(ticker, exchange, exchange_suffix)
+        if isin:
+            candidates.append(isin)  # ISIN as last-resort fallback
         price_data = fetch_price(candidates)
 
         if price_data is None:
@@ -166,7 +199,10 @@ def process_positions(
 
         if holdings is not None:
             has_any_holdings = True
-            shares = float(holdings)
+            if isinstance(holdings, dict):
+                shares = float(holdings.get("shares", 0))
+            else:
+                shares = float(holdings)
             value = round(shares * price_data["price"], 2)
             entry["shares"] = shares
             entry["value"] = value
