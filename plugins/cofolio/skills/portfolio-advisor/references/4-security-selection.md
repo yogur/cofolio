@@ -2,7 +2,7 @@
 
 ## Instructions
 
-You are running Stage 4 of the CoFolio portfolio pipeline — security selection and screening. Your job is to turn the abstract allocation targets (from `asset-allocation.md`) and selected macro themes (from `macro-themes.md`) into concrete, investable instruments. You do this by generating screening briefs, dispatching the security screener subagent to find candidates, presenting them to the user for selection, and writing `portfolio.json`.
+You are running Stage 4 of the CoFolio portfolio pipeline — security selection and screening. Your job is to turn the abstract allocation targets (from `asset-allocation.md`) and selected macro themes (from `macro-themes.md`) into concrete, investable instruments. You do this by generating screening briefs, dispatching research subagents to find candidates, presenting them to the user for selection, and writing `portfolio.json`.
 
 The screening brief templates, brokerage constraint reference, ETF and stock evaluation criteria, portfolio.json schema, and instrument selection guidelines are in the reference sections below.
 
@@ -45,7 +45,7 @@ If `asset-allocation.md` doesn't exist, tell the user they need to complete thei
 
 ### 2. Generate screening briefs
 
-For each allocation slot that needs an instrument, generate a screening brief. A screening brief is a focused search instruction for the security screener subagent.
+For each allocation slot that needs an instrument, generate a screening brief. A screening brief is a focused search instruction for the security research subagent.
 
 **Core slots** — derive from the core bucket in `asset-allocation.md`:
 
@@ -68,7 +68,7 @@ Use the brief templates in the reference sections below as starting points.
 
 **Before dispatching briefs, present the plan to the user:**
 
-Show them the list of slots and what you'll be searching for. This is their chance to adjust before you send the subagent on multiple searches.
+Show them the list of slots and what you'll be searching for. This is their chance to adjust before you dispatch multiple searches.
 
 > "Based on your allocation and selected themes, here's what I'll be screening for:
 >
@@ -86,9 +86,9 @@ Show them the list of slots and what you'll be searching for. This is their chan
 
 Adapt the level of detail to the user's experience level.
 
-### 3. Invoke the security screener subagent
+### 3. Delegate security screening
 
-For each screening brief, invoke the `security-screener` agent. Construct the prompt to include:
+Read `references/security-screener.md`, then invoke a research subagent using that full prompt plus each screening brief. Add:
 
 - The screening brief (what to find)
 - Brokerage constraints from the investor profile (exchange, UCITS requirement, accumulating/distributing preference, jurisdiction)
@@ -98,10 +98,10 @@ For each screening brief, invoke the `security-screener` agent. Construct the pr
 
 **Dispatch strategy:**
 
-- **Run briefs in parallel where possible.** Core slot searches are independent of each other. Satellite slot searches are independent of core. Invoke multiple agent instances simultaneously to save time.
+- **Run briefs in parallel where possible.** Core slot searches are independent of each other. Satellite slot searches are independent of core. Invoke multiple subagent instances simultaneously to save time.
 - **If a search returns fewer than 2 candidates,** note this to the user and offer to broaden the criteria (e.g., include distributing funds, relax AUM threshold, check other exchanges).
 
-The agent returns structured candidate profiles. It does NOT write files — you receive its output.
+The subagent returns structured candidate profiles. It does NOT write files — you receive its output.
 
 ### 4. Validate agent results
 
@@ -115,7 +115,7 @@ Before presenting to the user, check each candidate against the Data Completenes
 - [ ] Performance data (1Y, 3Y, 5Y where available)
 - [ ] For stocks: valuation snapshot fully populated
 
-If a candidate is missing top holdings data, do not present it as a selectable option — top holdings are what Stage 5's overlap analysis runs on, so a candidate without them is unusable downstream. Re-invoke the agent with a focused query for that specific fund's holdings, or drop the candidate and note why.
+If a candidate is missing top holdings data, do not present it as a selectable option — top holdings are what Stage 5's overlap analysis runs on, so a candidate without them is unusable downstream. Re-invoke the subagent with a focused query for that specific fund's holdings, or drop the candidate and note why.
 
 For other missing fields (performance data, tracking error, etc.), you can still present the candidate but flag the gap clearly so the user makes an informed choice.
 
@@ -147,7 +147,7 @@ For each slot, the user selects their preferred instrument. Handle these respons
 - **Individual stock instead of ETF (or vice versa):** If the user wants to switch instrument type for a slot, generate a new brief and re-screen.
 - **Watchlist items:** The user may say "I like Candidate 3 too — add it to the watchlist." Capture these separately.
 - **Custom additions:** The user may want to add an instrument they already know about (e.g., "I already own VWCE, use that for the global slot"). Accept it, but note that you'll need the same data fields — look up the instrument to fill in top holdings, geographic/sector splits, etc.
-- **Questions about candidates:** Answer from the agent's research. If the user wants deeper analysis, invoke the agent again for a focused follow-up.
+- **Questions about candidates:** Answer from the subagent's research. If the user wants deeper analysis, invoke it again for a focused follow-up.
 - **Slot merging:** The user may say "I want one global ETF instead of separate US and Europe" — adjust the slot structure accordingly.
 
 Track selections as you go. After each slot selection, briefly confirm what's been selected so far.
@@ -205,7 +205,7 @@ After writing, tell the user:
 
 ## Important Behaviors
 
-- **Don't skip the subagent.** The security screener subagent does the actual web research to find current data. You generate briefs and present results — don't substitute your own instrument knowledge for the agent's research. Your training data may have stale TERs, AUMs, and holdings.
+- **Use current research.** Delegate with `references/security-screener.md`; if delegation is unavailable, follow that prompt yourself with web research. Do not substitute recalled instrument data for current TERs, AUMs, or holdings.
 - **Don't recommend.** Present candidates neutrally with trade-offs. "Candidate A has a lower TER but smaller AUM" — not "Candidate A is better." If the user asks for a recommendation, you can note which candidate has the strongest metrics across the evaluation criteria, but frame it as analysis, not advice.
 - **Top holdings are non-negotiable.** The top 10-15 holdings with weight percentages are the single most important data point for the entire rest of the pipeline. Stage 5's overlap analysis depends entirely on this data. If the screener agent returns candidates without holdings data, push back and re-search. Do not write portfolio.json without holdings data.
 - **Verify exchange availability.** Don't assume an instrument is available on the user's exchange. The screening brief should specify the exchange, and the agent should confirm listing. If there's doubt, flag it.
@@ -224,7 +224,7 @@ This file contains screening brief templates, brokerage constraint reference, ET
 
 ## Screening Brief Templates
 
-Use these as starting points for constructing briefs for the security screener subagent. Customize each brief with the specific parameters from the investor's profile and allocation.
+Use these as starting points for constructing briefs for the security research subagent. Customize each brief with the specific parameters from the investor's profile and allocation.
 
 ### Core ETF Brief Template
 

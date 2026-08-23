@@ -162,7 +162,7 @@ These checks usually pass. Don't belabor them unless something has genuinely cha
 
 If a thesis is invalidated or weakened, discuss with the user before proceeding. Options include:
 - Reduce the position's weight
-- Replace the instrument (triggers a security screening subagent)
+- Replace the instrument (triggers security screening)
 - Remove the position and redistribute weight
 - Keep the position but note the increased risk
 
@@ -207,7 +207,7 @@ After completing the maintenance cycle:
 - Summarize the key actions: what to buy this month, any position changes, any items to monitor
 - Note when the next maintenance review should happen (suggest monthly, or sooner if themes are stale or drift is significant)
 - Remind the user they can run `/portfolio-advisor` anytime to trigger another maintenance cycle
-- If `CLAUDE.md` needs updating to reflect the new state, note that
+- If `PORTFOLIO-CONTEXT.md` needs updating to reflect the new state, note that
 
 ## Important Behaviors
 
@@ -724,7 +724,7 @@ During maintenance, you may need to hand off to other pipeline components:
 | Situation | Action |
 |-----------|--------|
 | Macro themes are stale (>30 days) and user agrees to refresh | Read `references/3-macro-research.md` and follow its instructions |
-| A thesis is invalidated and user wants to find a replacement instrument | Invoke the `security-screener` agent with a screening brief |
+| A thesis is invalidated and user wants to find a replacement instrument | Read `references/security-screener.md` and delegate with a screening brief |
 | Target weights changed significantly (user adjusts allocation) | Read `references/5-portfolio-construction.md` for the weight adjustment workflow, or handle inline if changes are minor |
 | User wants a full report regeneration (not just maintenance updates) | Read `references/6-report-generation.md` and follow its instructions |
 | User wants to change their risk profile or contribution amount | Read `references/1-investor-profile.md` for Stage 1 re-entry |

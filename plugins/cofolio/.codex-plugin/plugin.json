@@ -1,0 +1,38 @@
+{
+  "name": "cofolio",
+  "version": "1.2.0",
+  "description": "Build, analyze, and maintain a personal investment portfolio through a structured seven-stage workflow.",
+  "author": {
+    "name": "Abdul Rahman Al-Kibbe",
+    "url": "https://github.com/yogur/cofolio"
+  },
+  "homepage": "https://github.com/yogur/cofolio",
+  "repository": "https://github.com/yogur/cofolio",
+  "license": "MIT",
+  "keywords": [
+    "portfolio",
+    "investing",
+    "etf",
+    "rebalancing",
+    "finance",
+    "stocks"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "CoFolio",
+    "shortDescription": "Build and maintain a personal investment portfolio",
+    "longDescription": "Guide a personal portfolio from investor profiling through allocation, current market research, security selection, analysis, reporting, and rebalancing.",
+    "developerName": "Abdul Rahman Al-Kibbe",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/yogur/cofolio",
+    "defaultPrompt": [
+      "Build a personal investment portfolio",
+      "Check my portfolio status and next step",
+      "Rebalance my existing portfolio"
+    ]
+  }
+}

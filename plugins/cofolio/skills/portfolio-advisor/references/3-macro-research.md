@@ -2,7 +2,7 @@
 
 ## Instructions
 
-You are running Stage 3 of the CoFolio portfolio pipeline — macro research and theme identification. Your job is to get high-quality macro research via the subagent, shape it into investable themes, let the user choose which themes to express in their portfolio, and write `macro-themes.md`.
+You are running Stage 3 of the CoFolio portfolio pipeline — macro research and theme identification. Your job is to obtain high-quality macro research, shape it into investable themes, let the user choose which themes to express in their portfolio, and write `macro-themes.md`.
 
 The research checklist, investability framework, confidence calibration guide, and output template are in the reference sections below.
 
@@ -32,15 +32,15 @@ Also read `asset-allocation.md` if it exists — knowing the allocation structur
 
 If neither file exists, that's fine — proceed with general macro research.
 
-### 2. Invoke the macro researcher subagent
+### 2. Delegate macro research
 
-Invoke the `macro-researcher` agent. Construct a research brief that includes:
+Read `references/macro-researcher.md`, then invoke a research subagent using that full prompt plus a research brief that includes:
 
 - Any investor context gathered in Step 1 (so the agent can prioritize relevant areas without ignoring others)
 - Whether this is a fresh research run or a refresh (if refreshing, mention the date of the last research so the agent focuses on what's changed)
 - A reminder to cover all six research categories (monetary policy, geopolitics, technology, commodities, sector rotations, regional dynamics) — even if the investor context suggests a narrower focus, broad coverage ensures the user sees the full landscape
 
-The agent will return structured research across multiple themes. It does NOT write files — you receive its output as a response.
+The subagent returns structured research across multiple themes. It does NOT write files — you receive its output as a response.
 
 ### 3. Synthesize the research into themes
 
@@ -116,7 +116,7 @@ After writing the file, tell the user:
 
 ## Important Behaviors
 
-- **Don't skip the agent.** The macro researcher subagent does the actual web research. You synthesize and present — don't substitute your own research for the agent's work. The agent's web access produces timely, sourced findings that you can't replicate from training data alone.
+- **Use current research.** Delegate with `references/macro-researcher.md`; if delegation is unavailable, follow that prompt yourself with web research. Do not substitute recalled information for current, sourced findings.
 - **Don't prescribe.** You present the macro landscape. The user decides what to act on. Even if a theme seems like an obvious fit for their profile, present it as an option, not a directive.
 - **Respect "I'm not interested in macro themes."** Some users may want a purely strategic allocation without thematic tilts. That's a valid choice — write a `macro-themes.md` with all themes marked as not selected and note "User opted for purely strategic allocation without thematic tilts" in the User-Added Themes section.
 - **Keep the file complete.** Every theme the agent found goes in the file, selected or not. The file is a research snapshot, not just a selection list. Downstream stages and future rebalancing cycles benefit from seeing the full picture.

@@ -1,0 +1,20 @@
+{
+  "name": "cofolio",
+  "interface": {
+    "displayName": "CoFolio"
+  },
+  "plugins": [
+    {
+      "name": "cofolio",
+      "source": {
+        "source": "local",
+        "path": "./plugins/cofolio"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

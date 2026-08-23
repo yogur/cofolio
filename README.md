@@ -1,6 +1,6 @@
 # CoFolio — Your AI-Powered Portfolio Advisor 📈
 
-CoFolio is a plugin for [Cowork](https://claude.com/product/cowork) (Anthropic's collaborative workspace) that guides you through building and maintaining a personal investment portfolio, from scratch to a fully analyzed, rebalanceable portfolio.
+CoFolio is a plugin for [Claude Cowork](https://claude.com/product/cowork), ChatGPT Work, and Codex that guides you through building and maintaining a personal investment portfolio, from scratch to a fully analyzed, rebalanceable portfolio.
 
 Think of it as having a knowledgeable financial advisor on call who walks you through every step: understanding your goals, researching the market, picking investments, checking for blind spots, and keeping things on track over time.
 
@@ -12,10 +12,10 @@ Think of it as having a knowledgeable financial advisor on call who walks you th
 
 ### Prerequisites
 
-- Claude Desktop
+- Claude Desktop with Cowork, ChatGPT Work, or Codex
 - Python 3.10+
 
-### Install the plugin
+### Claude Cowork
 
 1. Open the Claude Desktop app.
 2. Switch to the **Cowork** tab at the top.
@@ -33,12 +33,28 @@ Think of it as having a knowledgeable financial advisor on call who walks you th
 ```
 </details>
 
+### ChatGPT Work
+
+1. In ChatGPT, open **Plugins** and add CoFolio to your personal plugins using the package/import flow.
+2. Start a **Work** chat, type `@`, and select **CoFolio**.
+
+### Codex
+
+From this repository checkout:
+
+```bash
+codex plugin marketplace add .
+codex plugin add cofolio@cofolio
+```
+
 ### Start building your portfolio
 
-Open Cowork in any empty directory (this becomes your portfolio workspace):
+Open Claude Cowork, ChatGPT Work, or Codex in an empty directory (this becomes your portfolio workspace):
 
-```
-/portfolio-advisor
+```text
+Claude Cowork: /portfolio-advisor
+ChatGPT Work: @portfolio-advisor
+Codex: $portfolio-advisor
 ```
 
 CoFolio takes it from there. It'll ask about your financial situation, research the markets, help you pick investments, and produce a full portfolio report — all as a guided conversation.
@@ -97,12 +113,12 @@ CoFolio is built from modular components. Here's what powers each part of the ex
 |-------|------|
 | Portfolio Advisor | Single orchestrator: detects intent and pipeline stage, loads the relevant stage reference file, and guides you through every step from profiling to maintenance |
 
-### AI Research Agents
+### Specialist Research Prompts
 
-| Agent | Role |
+| Prompt | Role |
 |-------|------|
-| Macro Researcher | Goes online to investigate current macro conditions across 6 categories |
-| Security Screener | Searches for and evaluates specific ETFs, stocks, and bonds matching your criteria |
+| Macro Researcher | Guides delegated research into current macro conditions across 6 categories |
+| Security Screener | Guides delegated research into specific ETFs, stocks, and bonds matching your criteria |
 
 ### Analysis Scripts
 

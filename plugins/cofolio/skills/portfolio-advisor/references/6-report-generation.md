@@ -117,7 +117,7 @@ After the report is finalized:
 
 - Note that `report.md` is the user's reference document — they can share it, print it, or revisit it
 - Mention that the portfolio is now in maintenance mode (Stage 7) — when they want to rebalance or update, they can use `/portfolio-advisor`
-- If the orchestrator should update `CLAUDE.md`, note that
+- If the orchestrator should update `PORTFOLIO-CONTEXT.md`, note that
 
 ## Important Behaviors
 

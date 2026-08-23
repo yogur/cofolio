@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "cofolio",
+  "version": "1.2.0",
+  "description": "A multi-stage portfolio construction and maintenance advisor for building, analyzing, and rebalancing personal investment portfolios.",
+  "author": {
+    "name": "Abdul Rahman Al-Kibbe",
+    "url": "https://github.com/yogur/cofolio"
+  },
+  "homepage": "https://github.com/yogur/cofolio",
+  "repository": "https://github.com/yogur/cofolio",
+  "license": "MIT",
+  "keywords": [
+    "portfolio",
+    "investing",
+    "etf",
+    "rebalancing",
+    "finance",
+    "stocks"
+  ]
+}

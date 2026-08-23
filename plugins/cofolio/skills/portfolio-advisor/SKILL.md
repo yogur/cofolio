@@ -1,6 +1,7 @@
 ---
 name: portfolio-advisor
 description: "Multi-stage investment portfolio construction and maintenance advisor. Guides users from investor profiling through asset allocation, macro research, security selection, portfolio construction, report generation, and ongoing rebalancing. Detects pipeline state automatically and routes to the appropriate stage. Handles new portfolio creation, status checks, rebalancing, and standalone macro research. Use when the user mentions portfolios, investing, asset allocation, rebalancing, ETFs, stocks, risk tolerance, investor profile, macro themes, market research, portfolio drift, contribution optimization, or any portfolio-related intent — even if they don't explicitly say 'portfolio'. Also triggers on /new-portfolio, /rebalance, /research-macro, /portfolio-status, or general questions in a directory containing pipeline files (investor-profile.md, asset-allocation.md, macro-themes.md, portfolio.json, report.md)."
+license: MIT
 ---
 
 # Portfolio Advisor — Orchestrator
@@ -83,6 +84,8 @@ If the user's intent doesn't clearly match any of the above, briefly explain you
 
 The portfolio pipeline has 7 stages. Each stage reads from earlier files and produces a new one. The files **are** the state — if a file exists, that stage has been completed.
 
+If `PORTFOLIO-CONTEXT.md` exists, read it first as a concise summary before checking the pipeline files. The pipeline files remain the source of truth when the context summary differs from them.
+
 ```
 Stage 1: Investor Profile     → investor-profile.md
 Stage 2: Asset Allocation      → asset-allocation.md
@@ -102,7 +105,7 @@ Check the current working directory for these files:
 | `macro-themes.md` | Stage 3 complete — macro themes researched and selected |
 | `portfolio.json` | Stage 4+ — check contents to distinguish Stage 4 vs 5 |
 | `report.md` | Stage 6 complete — full report generated |
-| `CLAUDE.md` | Context file for session continuity (auto-generated, not a stage marker) |
+| `PORTFOLIO-CONTEXT.md` | Context file for session continuity (auto-generated, not a stage marker) |
 
 For `portfolio.json`, inspect the content:
 - If positions exist but `target_weight_pct` fields are all `null` → Stage 4 complete
@@ -116,11 +119,31 @@ Based on detected state, route to the next incomplete stage by reading the corre
 |-------|-------------------|----------------|---------|
 | 1 | No `investor-profile.md` | `references/1-investor-profile.md` | Conversational IPS interview — collects demographics, risk profile, brokerage, constraints; writes `investor-profile.md` |
 | 2 | `investor-profile.md` exists, no `asset-allocation.md` | `references/2-asset-allocation.md` | Proposes strategic allocation (asset classes, geography, structure, tilt budget); writes `asset-allocation.md` |
-| 3 | + `asset-allocation.md`, no `macro-themes.md` | `references/3-macro-research.md` | Invokes macro-researcher subagent, synthesizes themes, user selects; writes `macro-themes.md` |
-| 4 | + `macro-themes.md`, no `portfolio.json` | `references/4-security-selection.md` | Screens instruments via security-screener subagent, user selects; writes `portfolio.json` (no weights) |
+| 3 | + `asset-allocation.md`, no `macro-themes.md` | `references/3-macro-research.md` | Delegates with the macro researcher prompt, synthesizes themes, user selects; writes `macro-themes.md` |
+| 4 | + `macro-themes.md`, no `portfolio.json` | `references/4-security-selection.md` | Screens instruments with the security screener prompt, user selects; writes `portfolio.json` (no weights) |
 | 5 | `portfolio.json` exists (no weights) | `references/5-portfolio-construction.md` | Assigns weights, runs overlap/fees/concentration analysis scripts; writes final `portfolio.json` |
 | 6 | `portfolio.json` exists (with weights), no `report.md` | `references/6-report-generation.md` | Synthesizes all pipeline files into polished `report.md` |
 | 7 | `report.md` exists (pipeline complete) | `references/7-maintenance.md` | Drift analysis, contribution optimization, hypothesis validation, report update |
+
+## Specialist Research
+
+When a stage calls for specialist research, first read the relevant prompt reference:
+
+- Macro research: `references/macro-researcher.md`
+- Security screening: `references/security-screener.md`
+
+Invoke a research subagent with the full reference as its base prompt plus the stage-specific brief and available investor context. The subagent returns research only and does not write pipeline files. If the host cannot delegate, use the same prompt and perform the web research yourself; do not rely on recalled market or security data.
+
+## Python Analysis Runtime
+
+The analysis scripts in `scripts/` require the packages in `requirements.txt`. Prepare them only before a stage needs an analysis script:
+
+1. Check whether the chosen Python interpreter can import `numpy`, `pandas`, and `yfinance`.
+2. If packages are missing, explain that dependencies must be downloaded and obtain permission.
+3. Prefer `uv run --with-requirements <resolved skill path>/requirements.txt python <resolved skill path>/scripts/<script>.py ...`.
+4. If `uv` is unavailable, create a temporary virtual environment with `python3 -m venv`, install the same requirements into it, and run the script with that environment's interpreter.
+
+Use the resolved skill paths; do not assume the portfolio workspace contains the plugin files or install dependencies globally.
 
 ## How to Load a Stage
 
@@ -130,7 +153,7 @@ When you've determined which stage to enter:
 2. **Summarize** relevant upstream files briefly — key points only, not full contents (e.g., "Your profile: 32yo, aggressive growth, €3.5K/month, Germany")
 3. **Read the reference file** for the active stage from the path in the routing table above. Read ONLY that file — do not load other stage files.
 4. **Follow the instructions** in the loaded reference file to execute the stage.
-5. **After the stage completes** and writes its output file, proceed to the **CLAUDE.md Generation** section below.
+5. **After the stage completes** and writes its output file, proceed to the **Portfolio Context Generation** section below.
 
 ## Stage Re-entry
 
@@ -181,9 +204,9 @@ No portfolio found in this directory.
 Say "build me a portfolio" or describe your investment goals to get started.
 ```
 
-## CLAUDE.md Generation
+## Portfolio Context Generation
 
-After any stage completes and writes its output file, generate or update the `CLAUDE.md` file in the project root. This file is the session continuity mechanism — a fresh session in this directory should have full context without the user re-explaining anything.
+After any stage completes and writes its output file, generate or update `PORTFOLIO-CONTEXT.md` in the project root. This file is the session continuity mechanism — a fresh session in this directory should have full context without the user re-explaining anything.
 
 ### When to Generate / Update
 
@@ -194,7 +217,7 @@ After any stage completes and writes its output file, generate or update the `CL
 
 ### Template
 
-Build `CLAUDE.md` by reading whichever pipeline files exist and assembling the sections below. Only include sections for which the source file exists.
+Build `PORTFOLIO-CONTEXT.md` by reading whichever pipeline files exist and assembling the sections below. Only include sections for which the source file exists.
 
 ````markdown
 <!-- Auto-generated by CoFolio orchestrator. Do not edit manually — changes will be overwritten when pipeline state updates. -->
@@ -271,7 +294,7 @@ For each source file, extract only the key facts — don't copy large blocks of 
 
 ### Keeping It Concise
 
-The `CLAUDE.md` should be **under 150 lines**. It's a context primer, not a copy of the pipeline files. List all portfolio positions (they fit in a table), but for macro themes include only selected ones with a one-liner each.
+`PORTFOLIO-CONTEXT.md` should be **under 150 lines**. It's a context primer, not a copy of the pipeline files. List all portfolio positions (they fit in a table), but for macro themes include only selected ones with a one-liner each.
 
 ## Important Behaviors
 
